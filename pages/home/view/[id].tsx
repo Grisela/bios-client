@@ -2,7 +2,7 @@ import Content from "Layout/Content";
 import Details from "components/home/PostDetails";
 import config from "components/home/config";
 
-const View = (props: any) => {
+const View = () => {
   const { breadcrumb } = config.view;
 
   return (

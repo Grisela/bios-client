@@ -27,7 +27,7 @@ import {
 import dayjs from "dayjs";
 import HomeContent from "components/home/Content";
 
-const limitData = 25;
+const limitData = 1;
 
 const HomePage = () => {
   const [postList, setPostList]: any = useState(null);

@@ -14,6 +14,7 @@ import {
   TagLabel,
   TagCloseButton,
   Badge,
+  Spinner,
 } from "@chakra-ui/react";
 import dayjs from "dayjs";
 import DOMPurify from "dompurify";
@@ -35,7 +36,6 @@ const Details = () => {
       const result: any = await getDoc(getDocument).then((res) => res.data());
       setPostData(result);
     } catch (e) {
-      console.log(e);
       toast({
         title: "Error Occured",
         description: "Error",
@@ -50,7 +50,11 @@ const Details = () => {
     idPost && getDataById(idPost);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [idPost]);
-  return (
+  return !postData ? (
+    <Flex w="100vw" h="100vh" justifyContent="center" alignItems="center">
+      <Spinner />
+    </Flex>
+  ) : (
     <Box>
       <Heading as="h3" size="lg">
         {postData?.title}
@@ -79,7 +83,11 @@ const Details = () => {
         alt="Picture"
       />
       <Box w="70vw">
-        <div dangerouslySetInnerHTML={createMarkupPreview()} />
+        <div
+          dangerouslySetInnerHTML={
+            postData?.description && createMarkupPreview()
+          }
+        />
       </Box>
     </Box>
   );

@@ -29,7 +29,9 @@ const Content = ({ breadcrumb = null, toolbar = null, children }: any) => {
             colorScheme="teal"
             variant="solid"
             onClick={() =>
-              router.push(`${router?.pathname}/${toolbar?.action}`)
+              router.push(`${router?.pathname}/${toolbar?.action}`, undefined, {
+                scroll: false,
+              })
             }
             size="md"
           >
