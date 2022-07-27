@@ -38,7 +38,13 @@ import {
 } from "@chakra-ui/react";
 import dayjs from "dayjs";
 import DOMPurify from "dompurify";
-import TextEditor from "components/tools/editable/TextEditor";
+import dynamic from "next/dynamic";
+const TextEditor = dynamic(
+  () => import("components/tools/editable/TextEditor"),
+  {
+    ssr: false,
+  }
+);
 
 const limitData = 25;
 
@@ -50,8 +56,6 @@ const Details = () => {
   const [content, setContent] = useState("");
   const [loadComment, setLoadComment] = useState(false);
   const [comments, setComments] = useState(null);
-
-  console.log(comments);
 
   const auth = getAuth();
 
@@ -75,8 +79,6 @@ const Details = () => {
       });
     }
   };
-
-  console.log(auth?.currentUser);
 
   const handleAddComment = async () => {
     if (!content) return;
