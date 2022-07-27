@@ -9,7 +9,7 @@ export const breakpoints = {
 export const actionCodeSettings = {
   // URL you want to redirect back to. The domain (www.example.com) for this
   // URL must be in the authorized domains list in the Firebase Console.
-  url: "http://localhost/",
+  url: "https://bios-client-theta.vercel.app",
   // This must be true.
   handleCodeInApp: true,
   iOS: {
@@ -20,5 +20,5 @@ export const actionCodeSettings = {
     installApp: true,
     minimumVersion: "12",
   },
-  dynamicLinkDomain: "http://localhost/",
+  dynamicLinkDomain: "https://bios-client-theta.vercel.app",
 };
