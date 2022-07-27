@@ -20,5 +20,5 @@ export const actionCodeSettings = {
     installApp: true,
     minimumVersion: "12",
   },
-  dynamicLinkDomain: "http://localhost/",
+  dynamicLinkDomain: "https://bios-client-theta.vercel.app",
 };
