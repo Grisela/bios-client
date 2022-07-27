@@ -13,6 +13,8 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   const isRetainableRoute = ROUTES_TO_RETAIN.includes(router.asPath);
 
+  const excludedNavRoute = ["/auth/login"];
+
   // Add Component to retainedComponents if we haven't got it already
   if (isRetainableRoute && !retainedComponents?.current[router?.asPath]) {
     const MemoComponent = memo(Component);
@@ -48,7 +50,7 @@ function MyApp({ Component, pageProps }: AppProps) {
 
   return (
     <ChakraProvider>
-      <Navbar />
+      {!excludedNavRoute.includes(router?.pathname) && <Navbar />}
       <div>
         <div style={{ display: isRetainableRoute ? "block" : "none" }}>
           {Object.entries(retainedComponents.current).map(([path, c]) => (

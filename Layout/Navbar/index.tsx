@@ -14,6 +14,9 @@ import {
   useColorModeValue,
   useBreakpointValue,
   useDisclosure,
+  Image,
+  useToast,
+  Heading,
 } from "@chakra-ui/react";
 import {
   HamburgerIcon,
@@ -21,9 +24,14 @@ import {
   ChevronDownIcon,
   ChevronRightIcon,
 } from "@chakra-ui/icons";
+import handleSignout from "utils/handleSignOut";
+import { getAuth } from "config/firebase/firebase";
+import { useRouter } from "next/router";
 
 export default function WithSubnavigation() {
   const { isOpen, onToggle } = useDisclosure();
+  const router = useRouter();
+  const auth = getAuth();
 
   return (
     <Box>
@@ -53,13 +61,7 @@ export default function WithSubnavigation() {
           />
         </Flex>
         <Flex flex={{ base: 1 }} justify={{ base: "center", md: "start" }}>
-          <Text
-            textAlign={useBreakpointValue({ base: "center", md: "left" })}
-            fontFamily={"heading"}
-            color={useColorModeValue("gray.800", "white")}
-          >
-            Logo
-          </Text>
+          <Image src="/icon.svg" alt="icon" pt={3} pl={3} w="80px" />
 
           <Flex display={{ base: "none", md: "flex" }} ml={10}>
             <DesktopNav />
@@ -72,27 +74,27 @@ export default function WithSubnavigation() {
           direction={"row"}
           spacing={6}
         >
-          <Button
-            as={"a"}
-            fontSize={"sm"}
-            fontWeight={400}
-            variant={"link"}
-            href={"#"}
-          >
-            Sign In
-          </Button>
-          <Button
-            display={{ base: "none", md: "inline-flex" }}
-            fontSize={"sm"}
-            fontWeight={600}
-            color={"white"}
-            bg={"teal"}
-            _hover={{
-              bg: "pink.300",
-            }}
-          >
-            Sign Up
-          </Button>
+          {auth?.currentUser?.photoURL ? (
+            <Image
+              borderRadius="full"
+              boxSize="35px"
+              src={auth?.currentUser?.photoURL}
+              alt="Dan Abramov"
+            />
+          ) : (
+            <Flex
+              justifyContent="center"
+              alignItems="center"
+              w="35px"
+              h="35px"
+              borderRadius="3xl"
+              bg="teal"
+            >
+              <Heading as="h2" size="xl" color="white">
+                {auth?.currentUser?.email?.charAt(0)}
+              </Heading>
+            </Flex>
+          )}
         </Stack>
       </Flex>
 
@@ -203,16 +205,30 @@ const MobileNav = () => {
   );
 };
 
-const MobileNavItem = ({ label, children, href }: NavItem) => {
+const MobileNavItem = ({ label, children, href, signOut }: NavItem) => {
   const { isOpen, onToggle } = useDisclosure();
+  const router = useRouter();
+  const toast = useToast();
 
   return (
     <Stack spacing={4} onClick={children && onToggle}>
       <Flex
         py={2}
         as={Link}
-        href={href ?? "#"}
         justify={"space-between"}
+        onClick={() => {
+          signOut &&
+            handleSignout().then(() => {
+              toast({
+                title: "Signout",
+                description: `You've been signed out`,
+                status: "success",
+                duration: 3000,
+                isClosable: true,
+              });
+            });
+          router.push("/");
+        }}
         align={"center"}
         _hover={{
           textDecoration: "none",
@@ -261,6 +277,7 @@ interface NavItem {
   subLabel?: string;
   children?: Array<NavItem>;
   href?: string;
+  signOut?: boolean;
 }
 
 const NAV_ITEMS: Array<NavItem> = [
@@ -301,5 +318,9 @@ const NAV_ITEMS: Array<NavItem> = [
   {
     label: "Hire Designers",
     href: "#",
+  },
+  {
+    label: "Sign Out",
+    signOut: true,
   },
 ];

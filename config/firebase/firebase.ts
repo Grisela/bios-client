@@ -9,6 +9,8 @@ import {
   onAuthStateChanged,
   signOut,
   updateProfile,
+  createUserWithEmailAndPassword,
+  sendSignInLinkToEmail,
 } from "firebase/auth";
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -48,4 +50,6 @@ export {
   onAuthStateChanged,
   signOut,
   updateProfile,
+  createUserWithEmailAndPassword,
+  sendSignInLinkToEmail,
 };
