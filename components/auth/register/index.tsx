@@ -17,10 +17,15 @@ import {
   getAuth,
   sendSignInLinkToEmail,
   signInWithEmailAndPassword,
+  sendEmailVerification,
+  db,
+  updateProfile,
 } from "config/firebase/firebase";
 import { useRouter } from "next/router";
 import { actionCodeSettings } from "constant/globalVariable";
 import NextLink from "next/link";
+import { addDoc, collection, doc, setDoc } from "firebase/firestore";
+import dayjs from "dayjs";
 
 const theme = extendTheme({
   colors: {
@@ -34,13 +39,16 @@ const theme = extendTheme({
 
 const Index = () => {
   const toast = useToast();
-  const auth = getAuth();
+  const auth: any = getAuth();
   const [passwordFlag, setPasswordFlag] = useState(false);
 
   const router = useRouter();
 
-  const handleSendEmailVerification = async (email: string) => {
-    await sendSignInLinkToEmail(auth, email, actionCodeSettings)
+  const handleSendEmailVerification = async (
+    email: string,
+    username: string
+  ) => {
+    await sendEmailVerification(auth.currentUser)
       .then(() => {
         toast({
           title: "Success!",
@@ -49,7 +57,7 @@ const Index = () => {
           duration: 7000,
           isClosable: true,
         });
-        window.localStorage.setItem("emailForSignIn", email);
+        // window.localStorage.setItem("emailForSignIn", email);
       })
       .catch((error) => {
         const errorCode = error.code;
@@ -63,6 +71,79 @@ const Index = () => {
         });
         console.log(`${errorCode}: ${errorMessage}`);
       });
+    // await sendSignInLinkToEmail(auth, email, actionCodeSettings)
+    //   .then(() => {
+    //     toast({
+    //       title: "Success!",
+    //       description: `Register Success, Email verification has been sent`,
+    //       status: "success",
+    //       duration: 7000,
+    //       isClosable: true,
+    //     });
+    //     window.localStorage.setItem("emailForSignIn", email);
+    //   })
+    //   .catch((error) => {
+    //     const errorCode = error.code;
+    //     const errorMessage = error.message;
+    //     toast({
+    //       title: errorCode,
+    //       description: errorMessage,
+    //       status: "error",
+    //       duration: 700,
+    //       isClosable: true,
+    //     });
+    //     console.log(`${errorCode}: ${errorMessage}`);
+    //   });
+  };
+
+  const handleCreateUserDataAfterRegister = async (
+    userCredential: any,
+    username: string
+  ) => {
+    const userRef = collection(db, `myUsers`);
+    const data = {
+      created_at: dayjs().format("DD MMMM YYYY, HH:mm:ss:sss"),
+      username,
+      email: userCredential?.user?.email,
+      avatar: userCredential?.user?.photoURL
+        ? userCredential?.user?.photoURL
+        : null,
+    };
+    try {
+      const docRef = doc(userRef, userCredential?.user?.uid);
+      await setDoc(docRef, data)
+        .then(async () => {
+          await updateProfile(userCredential?.user, {
+            displayName: username,
+          }).then(() => {
+            toast({
+              title: "Success",
+              description: `User Registration Success, welcome ${username}!`,
+              status: "success",
+              duration: 700,
+              isClosable: true,
+            });
+            handleSendEmailVerification(userCredential?.user?.email, username);
+          });
+        })
+        .catch((e) => {
+          toast({
+            title: "Error",
+            description: "Registration Failed",
+            status: "error",
+            duration: 700,
+            isClosable: true,
+          });
+        });
+    } catch (e) {
+      toast({
+        title: "Error",
+        description: "Internal server error",
+        status: "error",
+        duration: 700,
+        isClosable: true,
+      });
+    }
   };
 
   const handleSignup = async (values: any) => {
@@ -73,7 +154,8 @@ const Index = () => {
     await createUserWithEmailAndPassword(auth, values?.email, values?.password)
       .then((userCredential) => {
         // Signed in
-        handleSendEmailVerification(values?.email);
+        handleCreateUserDataAfterRegister(userCredential, values?.username);
+        // handleSendEmailVerification(values?.email);
       })
       .catch((error) => {
         const errorCode = error.code;
@@ -95,13 +177,39 @@ const Index = () => {
         <Center mt={10}>
           <Flex flexDirection={{ base: "column" }}>
             <Formik
-              initialValues={{ email: "", password: "", repassword: "" }}
+              initialValues={{
+                username: "",
+                email: "",
+                password: "",
+                repassword: "",
+              }}
               onSubmit={(values, actions) => {
                 handleSignup(values);
               }}
             >
               {() => (
                 <Form>
+                  <Field Field name="username">
+                    {({ field, form }: any) => {
+                      return (
+                        <>
+                          <FormWithFLoatingLabel
+                            label="Username"
+                            isRequired={true}
+                            fieldProps={field}
+                            formProps={form}
+                            type="text"
+                            widthCustom={{
+                              base: "70vw",
+                              md: "30vw",
+                              lg: "30vw",
+                              xl: "30vw",
+                            }}
+                          />
+                        </>
+                      );
+                    }}
+                  </Field>
                   <Field Field name="email">
                     {({ field, form }: any) => {
                       return (

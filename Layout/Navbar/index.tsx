@@ -17,24 +17,68 @@ import {
   Image,
   useToast,
   Heading,
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+  Center,
 } from "@chakra-ui/react";
 import {
   HamburgerIcon,
   CloseIcon,
   ChevronDownIcon,
   ChevronRightIcon,
+  BellIcon,
 } from "@chakra-ui/icons";
 import handleSignout from "utils/handleSignOut";
 import { getAuth } from "config/firebase/firebase";
 import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
+import { useAuthState } from "react-firebase-hooks/auth";
 
 export default function WithSubnavigation() {
+  const [user] = useAuthState(getAuth());
   const { isOpen, onToggle } = useDisclosure();
   const router = useRouter();
-  const auth = getAuth();
+  const toast = useToast();
+
+  const relogUser = () => {
+    handleSignout()
+      .then(() => {
+        router.push(`/auth/login`);
+      })
+      .catch((e) =>
+        toast({
+          title: "Signout",
+          description: `You've been signed out`,
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        })
+      );
+  };
 
   return (
     <Box>
+      {user && !user?.emailVerified && (
+        <Flex
+          flexDirection="column"
+          w="100vw"
+          bg="red"
+          alignItems="center"
+          fontWeight="bold"
+        >
+          <Text fontSize="sm" color="white">
+            Please verify your email address
+          </Text>
+          <Text fontSize="sm" color="white">
+            Already verified? please re-log{" "}
+            <Text onClick={() => relogUser()} as="i" color="blue">
+              here
+            </Text>
+          </Text>
+        </Flex>
+      )}
       <Flex
         bg={useColorModeValue("white", "gray.800")}
         color={useColorModeValue("gray.600", "white")}
@@ -74,26 +118,89 @@ export default function WithSubnavigation() {
           direction={"row"}
           spacing={6}
         >
-          {auth?.currentUser?.photoURL ? (
-            <Image
-              borderRadius="full"
-              boxSize="35px"
-              src={auth?.currentUser?.photoURL}
-              alt="Dan Abramov"
-            />
+          {user ? (
+            <>
+              <Menu>
+                <MenuButton>
+                  <BellIcon w="25px" h="25px" color="teal" />
+                </MenuButton>
+                <MenuList w={{ base: "90vw", md: "30vw" }}>
+                  <MenuItem>
+                    <Box>
+                      <Text fontWeight="bold">Here is a title</Text>
+                      <Text>
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                        Illum, dolore.
+                      </Text>
+                    </Box>
+                  </MenuItem>
+                  <MenuItem>
+                    <Box>
+                      <Text fontWeight="bold">Here is a title</Text>
+                      <Text>
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                        Illum, dolore.
+                      </Text>
+                    </Box>
+                  </MenuItem>
+                  <MenuItem>
+                    <Box>
+                      <Text fontWeight="bold">Here is a title</Text>
+                      <Text>
+                        Lorem ipsum dolor sit amet consectetur adipisicing elit.
+                        Illum, dolore.
+                      </Text>
+                    </Box>
+                  </MenuItem>
+                </MenuList>
+              </Menu>
+              <Menu>
+                <MenuButton>
+                  {user?.photoURL ? (
+                    <Image
+                      borderRadius="full"
+                      boxSize="35px"
+                      src={user?.photoURL}
+                      alt="Dan Abramov"
+                    />
+                  ) : (
+                    <Flex
+                      justifyContent="center"
+                      alignItems="center"
+                      w="35px"
+                      h="35px"
+                      borderRadius="3xl"
+                      bg="teal"
+                    >
+                      <Heading as="h2" size="xl" color="white">
+                        {user.email?.charAt(0)}
+                      </Heading>
+                    </Flex>
+                  )}
+                </MenuButton>
+                <MenuList>
+                  <MenuItem>Profile</MenuItem>
+                  <MenuItem
+                    onClick={() => {
+                      handleSignout().then(() => {
+                        toast({
+                          title: "Signout",
+                          description: `You've been signed out`,
+                          status: "success",
+                          duration: 3000,
+                          isClosable: true,
+                        });
+                      });
+                      router.push("/");
+                    }}
+                  >
+                    Sign Out
+                  </MenuItem>
+                </MenuList>
+              </Menu>
+            </>
           ) : (
-            <Flex
-              justifyContent="center"
-              alignItems="center"
-              w="35px"
-              h="35px"
-              borderRadius="3xl"
-              bg="teal"
-            >
-              <Heading as="h2" size="xl" color="white">
-                {auth?.currentUser?.email?.charAt(0)}
-              </Heading>
-            </Flex>
+            <Text onClick={() => router.push("/auth/login")}>Sign In</Text>
           )}
         </Stack>
       </Flex>
@@ -318,9 +425,5 @@ const NAV_ITEMS: Array<NavItem> = [
   {
     label: "Hire Designers",
     href: "#",
-  },
-  {
-    label: "Sign Out",
-    signOut: true,
   },
 ];

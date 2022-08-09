@@ -5,7 +5,7 @@ import Navbar from "Layout/Navbar";
 import { useRouter } from "next/router";
 import { memo, useEffect, useRef } from "react";
 
-const ROUTES_TO_RETAIN = ["/", "/home"];
+const ROUTES_TO_RETAIN = ["/", "/posts"];
 
 function MyApp({ Component, pageProps }: AppProps) {
   const router = useRouter();

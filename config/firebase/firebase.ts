@@ -11,6 +11,7 @@ import {
   updateProfile,
   createUserWithEmailAndPassword,
   sendSignInLinkToEmail,
+  sendEmailVerification,
 } from "firebase/auth";
 
 // TODO: Add SDKs for Firebase products that you want to use
@@ -52,4 +53,6 @@ export {
   updateProfile,
   createUserWithEmailAndPassword,
   sendSignInLinkToEmail,
+  sendEmailVerification,
+  firebaseConfig,
 };
