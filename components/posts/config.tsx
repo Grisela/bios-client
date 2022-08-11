@@ -12,7 +12,7 @@ const config = {
       const breadcrumbData: Array<breadcrumbDataProps> = [
         {
           idx: 0,
-          text: "Home",
+          text: "Post",
           link: "/",
         },
         {

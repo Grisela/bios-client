@@ -24,7 +24,9 @@ const Content = ({ dataSource }: any) => {
           <Box>
             <Heading
               onClick={() =>
-                router.push(`/home/view/${e?.id}`, undefined, { scroll: false })
+                router.push(`/posts/view/${e?.id}`, undefined, {
+                  scroll: false,
+                })
               }
               as="h3"
               size="lg"
