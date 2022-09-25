@@ -25,7 +25,7 @@ import {
   TagLabel,
 } from "@chakra-ui/react";
 import dayjs from "dayjs";
-import HomeContent from "components/home/Content";
+import PostContent from "components/posts/Content";
 
 const limitData = 25;
 
@@ -77,7 +77,7 @@ const HomePage = () => {
 
   return (
     <Box m={5}>
-      <HomeContent dataSource={postList} />
+      <PostContent dataSource={postList} />
       {postsEnd ? (
         <></>
       ) : (
